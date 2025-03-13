@@ -5,8 +5,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # ソースコードをコピーしてビルド
-COPY . ./cmd/api
-RUN CGO_ENABLED=0 GOOS=linux go build -o user-api .
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -o user-api ./cmd/api/
 
 # 最小限のランタイムイメージ（Distroless）を利用
 FROM gcr.io/distroless/base-debian10
