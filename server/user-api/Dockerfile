@@ -5,7 +5,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # ソースコードをコピーしてビルド
-COPY . .
+COPY . ./cmd/api
 RUN CGO_ENABLED=0 GOOS=linux go build -o user-api .
 
 # 最小限のランタイムイメージ（Distroless）を利用
