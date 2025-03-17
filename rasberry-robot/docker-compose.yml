@@ -1,0 +1,20 @@
+services:
+  mqtt:
+    build:
+      context: ./mqtt-broker
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+  python:
+    image: python:3
+    container_name: rasberry_robot
+    working_dir: /cmd
+    volumes:
+      - ./rasberry-robot-client:/cmd
+    command: python3 cmd/api.py
