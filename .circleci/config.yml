@@ -44,7 +44,23 @@ jobs:
     steps:
       - checkout
       - setup-gcp
-      
+      - gcp-gcr/build-and-push-image:
+          name: Build and Push User API Image
+          image: gcr.io/rasberry-robot/user-api
+          filters:
+            branches:
+              only: master
+      - gcp-gcr/add-image-tag:
+          working_directory: ~/repo/user-api
+          name: Add Image Tag
+          image: gcr.io/rasberry-robot/user-api
+          requires:
+            - Build and Push User API Image
+          source-tag: latest
+          target-tag: $CIRCLE_SHA1
+          filters:
+            branches:
+              only: main
   deploy-rasberry-robot:
     working_directory: ~/repo/rasberry-robot
     executor: gcp-cli/default
@@ -62,24 +78,13 @@ workflows:
   version: 2
   deploy-workflow:
     jobs:
-      - gcp-gcr/build-and-push-image:
-          name: Build and Push User API Image
-          image: gcr.io/rasberry-robot/user-api
-          # filters:
-          #   branches:
-          #     only: main
-      - gcp-gcr/add-image-tag:
-          name: Add Image Tag
-          image: gcr.io/rasberry-robot/user-api
-          requires:
-            - Build and Push User API Image
-          source-tag: latest
-          target-tag: $CIRCLE_SHA1
-          # filters:
-          #   branches:
-          #     only: main
+      - deploy-user-api:
+          name: Deploy User API
+          filters:
+            branches:
+              only: master
       - deploy-rasberry-robot:
           name: Deploy Raspberry Robot
-          # filters:
-          #   branches:
-          #     only: main
+          filters:
+            branches:
+              only: master
