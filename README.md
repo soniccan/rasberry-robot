@@ -1,4 +1,1 @@
-rasberry-robot
-
-
-## Dockerfile起動
+rasberry-robotは、soniccanの自宅をIP通信で制御するプログラム
