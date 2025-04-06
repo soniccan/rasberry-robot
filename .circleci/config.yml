@@ -46,14 +46,12 @@ commands:
 
 jobs:
   deploy-user-api:
-    environment:
-      MY_WORKING_DIR: ~/user-api
-    working_directory: << pipeline.parameters.MY_WORKING_DIR >>
+    working_directory: ~/user-api
     executor: gcp-gcr/default
     steps:
       - checkout
       - go-vet:
-          working_dir: << pipeline.parameters.MY_WORKING_DIR >>
+          working_dir: ~/user-api
       - setup-gcp
       - gcp-gcr/gcr-auth:
           use_oidc: true
