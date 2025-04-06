@@ -4,7 +4,6 @@ orbs:
   slack: circleci/slack@3.4.2
   go: circleci/go@3.0.0
   gcp-cli: circleci/gcp-cli@3.1
-  gcp-cloud-run: circleci/gcp-cloud-run@1.0.2
   gcp-gcr: circleci/gcp-gcr@0.16.10
   docker: circleci/docker@2.2.0
 
@@ -37,6 +36,9 @@ commands:
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
+      - gcp-gcr/setup:
+          version: 0.16.10
+          use_oidc: true
 
 jobs:
   deploy-user-api:
@@ -55,6 +57,8 @@ workflows:
   version: 2
   deploy-workflow:
     jobs:
+      - go-lint:
+          name: Go Lint
       - gcp-gcr/build-and-push-image:
           name: Build and Push User API Image
           image: gcr.io/rasberry-robot/user-api
