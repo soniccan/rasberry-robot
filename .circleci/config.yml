@@ -36,17 +36,29 @@ commands:
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
-      - gcp-gcr/setup:
-          version: 0.16.10
-          use_oidc: true
 
 jobs:
   deploy-user-api:
     working_directory: ~/repo/user-api
-    executor: gcp-cli/default
+    executor: gcp-gcr/default
     steps:
       - checkout
+      - go-lint
       - setup-gcp
+      - gcp-gcr/gcr-auth:
+          use-oidc: true
+      - gcp-gcr/build-image:
+          image: rasberry-robot/user-api
+          registry-url: gcr.io
+          digest-file: /tmp/digest.txt
+      - gcp-gcr/push-image:
+          digest-file: /tmp/digest.txt
+          image: rasberry-robot/user-api
+          registry-url: gcr.io
+      - run:
+          name: Deploy User API
+          command: |
+            echo "Digest: $(cat /tmp/digest.txt)" t
   deploy-rasberry-robot:
     working_directory: ~/repo/rasberry-robot
     executor: gcp-cli/default
@@ -57,25 +69,11 @@ workflows:
   version: 2
   deploy-workflow:
     jobs:
-      - go-lint:
-          name: Go Lint
-      - gcp-gcr/build-and-push-image:
+      - deploy-user-api:
           name: Build and Push User API Image
-          image: gcr.io/rasberry-robot/user-api
-          docker-context: ~/repo/user-api
           filters:
             branches:
               only: master
-      - gcp-gcr/add-image-tag:
-          name: Add Image Tag
-          image: gcr.io/rasberry-robot/user-api
-          requires:
-            - Build and Push User API Image
-          source-tag: latest
-          target-tag: $CIRCLE_SHA1
-          filters:
-            branches:
-              only: main
       - deploy-rasberry-robot:
           name: Deploy Raspberry Robot
           filters:
