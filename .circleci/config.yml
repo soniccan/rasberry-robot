@@ -26,10 +26,15 @@ on:
       - main
 commands:
   go-vet:
+    parameters:
+      working_dir:
+        type: string
+        default: "."
     steps:
       - run:
           name: Go Vet
           command: |
+            cd << parameters.working_dir >>
             ls -la
             pwd
             go vet ./...
@@ -41,11 +46,14 @@ commands:
 
 jobs:
   deploy-user-api:
-    working_directory: ~/user-api
+    environment:
+      MY_WORKING_DIR: ~/user-api
+    working_directory: << pipeline.parameters.MY_WORKING_DIR >>
     executor: gcp-gcr/default
     steps:
       - checkout
-      - go-vet
+      - go-vet:
+          working_dir: << pipeline.parameters.MY_WORKING_DIR >>
       - setup-gcp
       - gcp-gcr/gcr-auth:
           use_oidc: true
