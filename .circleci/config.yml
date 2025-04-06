@@ -46,17 +46,15 @@ jobs:
       - go-lint
       - setup-gcp
       - gcp-gcr/gcr-auth:
-          use-oidc: true
+          use_oidc: true
       - gcp-gcr/build-image:
           image: rasberry-robot/user-api
           registry-url: gcr.io
-          digest-file: /tmp/digest.txt
       - gcp-gcr/push-image:
-          digest-file: /tmp/digest.txt
+          digest-path: /tmp/digest.txt
           image: rasberry-robot/user-api
           registry-url: gcr.io
       - run:
-          name: Deploy User API
           command: |
             echo "Digest: $(cat /tmp/digest.txt)" t
   deploy-rasberry-robot:
