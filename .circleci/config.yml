@@ -1,0 +1,85 @@
+version: 2.1
+orbs:
+  terraform: circleci/terraform@2.1.0
+  slack: circleci/slack@3.4.2
+  go: circleci/go@3.0.0
+  gcp-cli: circleci/gcp-cli@3.1
+  gcp-cloud-run: circleci/gcp-cloud-run@1.0.2
+  gcp-gcr: circleci/gcp-gcr@0.16.10
+  docker: circleci/docker@2.2.0
+
+name: Deploy to Cloud Run
+
+executors:
+  docker-executor:
+    docker:
+      - image: cimg/base:current
+        user: root
+  go-executor:
+    docker:
+      - image: cimg/go:1.24
+  go-test-build-executor:
+    docker:
+      - image: cimg/go:1.24
+on:
+  push:
+    branches:
+      - main
+commands:
+  go-lint:
+    steps:
+      - run:
+          name: Go Lint
+          command: |
+            go lint
+  setup-gcp:
+    steps:
+      - gcp-cli/setup:
+          version: 404.0.0
+          use_oidc: true
+jobs:
+  deploy-user-api:
+    working_directory: ~/repo/user-api
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - setup-gcp
+      
+  deploy-rasberry-robot:
+    working_directory: ~/repo/rasberry-robot
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - setup-gcp
+      - run:
+          name: Deploy Raspberry Robot
+          command: |
+            gcloud run deploy raspberry-robot \
+            --source . \
+            --region us-central1 \
+            --allow-unauthenticated
+workflows:
+  version: 2
+  deploy-workflow:
+    jobs:
+      - gcp-gcr/build-and-push-image:
+          name: Build and Push User API Image
+          image: gcr.io/rasberry-robot/user-api
+          filters:
+            branches:
+              only: main
+      - gcp-gcr/add-image-tag:
+          name: Add Image Tag
+          image: gcr.io/rasberry-robot/user-api
+          requires:
+            - Build and Push User API Image
+          source-tag: latest
+          target-tag: $CIRCLE_SHA1
+          filters:
+            branches:
+              only: main
+      - deploy-rasberry-robot:
+          name: Deploy Raspberry Robot
+          filters:
+            branches:
+              only: main
