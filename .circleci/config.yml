@@ -30,6 +30,8 @@ commands:
       - run:
           name: Go Vet
           command: |
+            ls -la
+            pwd
             go vet ./...
   setup-gcp:
     steps:
