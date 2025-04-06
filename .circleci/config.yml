@@ -37,6 +37,7 @@ commands:
       - gcp-cli/setup:
           version: 404.0.0
           use_oidc: true
+
 jobs:
   deploy-user-api:
     working_directory: ~/repo/user-api
@@ -44,14 +45,24 @@ jobs:
     steps:
       - checkout
       - setup-gcp
+  deploy-rasberry-robot:
+    working_directory: ~/repo/rasberry-robot
+    executor: gcp-cli/default
+    steps:
+      - checkout
+      - setup-gcp
+workflows:
+  version: 2
+  deploy-workflow:
+    jobs:
       - gcp-gcr/build-and-push-image:
           name: Build and Push User API Image
           image: gcr.io/rasberry-robot/user-api
+          docker-context: ~/repo/user-api
           filters:
             branches:
               only: master
       - gcp-gcr/add-image-tag:
-          working_directory: ~/repo/user-api
           name: Add Image Tag
           image: gcr.io/rasberry-robot/user-api
           requires:
@@ -61,28 +72,6 @@ jobs:
           filters:
             branches:
               only: main
-  deploy-rasberry-robot:
-    working_directory: ~/repo/rasberry-robot
-    executor: gcp-cli/default
-    steps:
-      - checkout
-      - setup-gcp
-      - run:
-          name: Deploy Raspberry Robot
-          command: |
-            gcloud run deploy raspberry-robot \
-            --source . \
-            --region us-central1 \
-            --allow-unauthenticated
-workflows:
-  version: 2
-  deploy-workflow:
-    jobs:
-      - deploy-user-api:
-          name: Deploy User API
-          filters:
-            branches:
-              only: master
       - deploy-rasberry-robot:
           name: Deploy Raspberry Robot
           filters:
