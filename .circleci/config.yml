@@ -46,12 +46,12 @@ commands:
 
 jobs:
   deploy-user-api:
-    working_directory: ~/user-api
+    working_directory: ~/repo/
     executor: gcp-gcr/default
     steps:
       - checkout
       - go-vet:
-          working_dir: ~/user-api
+          working_dir: ~/repo/user-api
       - setup-gcp
       - gcp-gcr/gcr-auth:
           use_oidc: true
@@ -66,7 +66,7 @@ jobs:
           command: |
             echo "Digest: $(cat /tmp/digest.txt)"
   deploy-rasberry-robot:
-    working_directory: ~/rasberry-robot
+    working_directory: ~/repo/rasberry-robot
     executor: gcp-cli/default
     steps:
       - checkout
