@@ -35,8 +35,6 @@ commands:
           name: Go Vet
           command: |
             cd << parameters.working_dir >>
-            ls -la
-            pwd
             go vet ./...
   setup-gcp:
     steps:
