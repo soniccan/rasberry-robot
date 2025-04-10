@@ -20,6 +20,10 @@ executors:
   go-test-build-executor:
     docker:
       - image: cimg/go:1.24
+  terraform-executor:
+    docker:
+      - image: hashicorp/terraform:1.5.7
+
 on:
   push:
     branches:
@@ -69,6 +73,22 @@ jobs:
     steps:
       - checkout
       - setup-gcp
+  terraform-apply:
+    working_directory: ~/repo/iac/teraform
+    executor: terraform-executor
+    steps:
+      - checkout
+      - setup-gcp
+      - terraform/init:
+          path: ./module
+      - terraform/validate:
+          path: ./module
+      - terraform/plan:
+          path: ./module
+      - terraform/apply:
+          path: ./module
+          auto-approve: true
+
 workflows:
   version: 2
   deploy-workflow:
@@ -80,6 +100,13 @@ workflows:
               only: master
       - deploy-rasberry-robot:
           name: Deploy Raspberry Robot
+          filters:
+            branches:
+              only: master
+      - terraform-apply:
+          name: Apply Terraform Infrastructure
+          requires:
+            - Build and Push User API Image
           filters:
             branches:
               only: master

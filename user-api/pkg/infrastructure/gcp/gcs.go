@@ -19,22 +19,22 @@ import (
 	"google.golang.org/api/option"
 )
 
-// CloudStorage -
-type CloudStorage struct {
+// GCS -
+type GCS struct {
 	Client *gcs.Client
 }
 
-// NewCloudStorage はCloud Storageのクライアントを作成する
-func NewCloudStorage(ctx context.Context, projectID string) (*CloudStorage, error) {
+// NewGCS はGCSのクライアントを作成する
+func NewGCS(ctx context.Context, projectID string) (*GCS, error) {
 	client, err := gcs.NewClient(ctx, option.WithCredentialsJSON([]byte(os.Getenv("GCS_CREDENTIALS_JSON"))))
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize gcs client. %w", err)
 	}
-	return &CloudStorage{Client: client}, nil
+	return &GCS{Client: client}, nil
 }
 
-// Put はCloud Storageにデータを保存する
-func (cs *CloudStorage) Put(ctx context.Context, bucket string, key string, data [][]string) error {
+// Put はGCSにデータを保存する
+func (cs *GCS) Put(ctx context.Context, bucket string, key string, data [][]string) error {
 	if err := retry.Do(
 		func() error {
 			var (
@@ -84,7 +84,7 @@ func (cs *CloudStorage) Put(ctx context.Context, bucket string, key string, data
 }
 
 // handleErrorResponse は GCS のエラーをハンドリングする
-func (*CloudStorage) handleErrorResponse(err error, bucket string, key string) error {
+func (*GCS) handleErrorResponse(err error, bucket string, key string) error {
 	gcsError, ok := myerr.As[*googleapi.Error](err)
 	if !ok {
 		return fmt.Errorf("bucket:[%s] key:[%s]. %w", bucket, key, err)

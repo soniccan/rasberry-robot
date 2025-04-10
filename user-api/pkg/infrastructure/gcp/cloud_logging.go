@@ -13,6 +13,15 @@ type CloudLoggingClient struct {
 	Client *cloudLogging.Client
 }
 
+// NewCloudLogging はCloud Loggingのクライアントを作成する
+func NewCloudLogging(ctx context.Context, projectID string) (*CloudLoggingClient, error) {
+	client, err := cloudLogging.NewClient(ctx, projectID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create logging client: %w", err)
+	}
+	return &CloudLoggingClient{Client: client}, nil
+}
+
 // NewCloudLoggingClient はCloud Loggingのクライアントを作成する
 func NewCloudLoggingClient(ctx context.Context, projectID string) (*CloudLoggingClient, error) {
 	client, err := cloudLogging.NewClient(ctx, projectID)

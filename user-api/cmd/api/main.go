@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
 
+	cloudLogging "cloud.google.com/go/logging"
 	"github.com/joho/godotenv"
+	"github.com/rasberry-robot/user-api/pkg/infrastructure/gcp"
 )
 
 func main() {
@@ -13,6 +16,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("環境変数の読み込みに失敗しました: %v", err)
 	}
+
+	gcp, err := gcp.NewGCP(context.Background(), os.Getenv("GCP_PROJECT_ID"))
+	if err != nil {
+		log.Fatalf("GCPの初期化に失敗しました: %v", err)
+	}
+
+	gcp.CloudLogging().Log(context.Background(), "user-api", cloudLogging.Default, "テストログ")
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		// .envからCLOUDRUN_URLを取得
