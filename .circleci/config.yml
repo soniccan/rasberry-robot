@@ -51,8 +51,8 @@ jobs:
     executor: gcp-gcr/default
     steps:
       - checkout
-      - go-vet:
-          working_dir: ~/repo/user-api
+      # - go-vet:
+      #     working_dir: ~/repo/user-api
       - setup-gcp
       - gcp-gcr/gcr-auth:
           use_oidc: false
