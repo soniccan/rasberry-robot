@@ -105,10 +105,11 @@ workflows:
           filters:
             branches:
               only: master
-      - terraform-apply:
-          name: Apply Terraform Infrastructure
-          requires:
-            - Build and Push User API Image
-          filters:
-            branches:
-              only: master
+      # TODO:terraform化
+      # - terraform-apply:
+      #     name: Apply Terraform Infrastructure
+      #     requires:
+      #       - Build and Push User API Image
+      #     filters:
+      #       branches:
+      #         only: master

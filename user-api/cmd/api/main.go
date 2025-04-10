@@ -31,12 +31,6 @@ func main() {
 			http.Error(w, "CLOUDRUN_URLが設定されていません", http.StatusInternalServerError)
 			return
 		}
-		// 正常なHTTPレスポンスを返す
-		w.WriteHeader(http.StatusOK)
-		_, err := w.Write([]byte("Cloud Run URL: " + cloudRunURL))
-		if err != nil {
-			log.Printf("レスポンスの書き込み中にエラーが発生しました: %v", err)
-		}
 	})
 
 	log.Println("サーバーがポート8080で起動しています...")
