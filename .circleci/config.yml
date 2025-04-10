@@ -23,7 +23,6 @@ executors:
   terraform-executor:
     docker:
       - image: hashicorp/terraform:1.5.7
-
 on:
   push:
     branches:
