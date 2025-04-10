@@ -85,9 +85,11 @@ jobs:
           path: ./module
       - terraform/plan:
           path: ./module
-      - terraform/apply:
-          path: ./module
-          auto-approve: true
+      - run:
+          name: Terraform Apply
+          command: |
+            cd ./module
+            terraform apply -auto-approve
 
 workflows:
   version: 2
