@@ -43,7 +43,7 @@ commands:
     steps:
       - gcp-cli/setup:
           version: 404.0.0
-          use_oidc: true
+          # use_oidc: true
 
 jobs:
   deploy-user-api:
@@ -55,7 +55,7 @@ jobs:
           working_dir: ~/repo/user-api
       - setup-gcp
       - gcp-gcr/gcr-auth:
-          use_oidc: true
+          # use_oidc: true
       - gcp-gcr/build-image:
           image: rasberry-robot/user-api
           registry-url: gcr.io
