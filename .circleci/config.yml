@@ -95,13 +95,16 @@ workflows:
   version: 2
   deploy-workflow:
     jobs:
+      
       - deploy-user-api:
           name: Build and Push User API Image
+          context: rasberry-robot
           filters:
             branches:
               only: master
       - deploy-rasberry-robot:
           name: Deploy Raspberry Robot
+          context: rasberry-robot
           filters:
             branches:
               only: master
